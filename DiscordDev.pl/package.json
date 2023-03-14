@@ -1,0 +1,19 @@
+{
+  "name": "discorddev.pl",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./structures/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Kraczek",
+  "license": "ISC",
+  "dependencies": {
+    "ascii-table": "^0.0.9",
+    "discord.js": "^14.7.1",
+    "dotenv": "^16.0.3",
+    "glob": "^7.2.0",
+    "ms": "^2.1.3"
+  }
+}
