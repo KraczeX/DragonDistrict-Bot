@@ -26,15 +26,14 @@ module.exports = {
 
           await interaction.deferReply({ ephemeral: true })
 
-          const { options, user, guild } = interaction
+          const { options, guild } = interaction
 
-          const member = options.getMember("user")
-          const reason = options.getString("reason") || "no reason provided"
+          const id = options.getString("user-id")
+          if (isNaN(id)) return EditReply(interaction, 'Podaj właściwe ID')
 
-          if (member.id === user.id) return EditReply(interaction, "❌" `Nie możesz wyrzucić tego użytkownika`)
-          if (guild.ownerId === member.id) return EditReply(interaction, "❌" `Nie możesz wyrzucić tego użytkownika`)
-          if (guild.members.me.roles.highest.position <= member.roles.highest.position) return EditReply(interaction, "❌" `Nie możesz wyrzucić tego użytkownika`)
-          if (interaction.member.roles.highest.position <= member.roles.highest.position) return EditReply(interaction, "❌" `Nie możesz wyrzucić tego użytkownika`)
+          const bannedMembers = await guild.bans.fetch()
+          if (!bannedMembers.find(x => x.user.id === id)) return EditReply(interaction, "Ten użytkownik jest na serwerze")
+
 
           const Embed = new EmbedBuilder()
                .setColor(client.color)
