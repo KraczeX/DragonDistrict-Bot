@@ -1,12 +1,13 @@
-const { Client, ChatInputCommandInteraction, ApplicationCommandOptionType, EmbedBuilder, Colors, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, Collection } = require("discord.js")
-const { execute } = require("../../Events/Client/ready")
-const editReply = require("../../Systems/editReply")
+const { Client, ChatInputCommandInteraction, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ApplicationCommandOptionType} = require("discord.js")
+const ms = require("ms")
+const EditReply = require("../../Systems/editReply")
+
 
 module.exports = {
      name: "ban",
-     description: "ban a member from this server",
-     UserPerms: ["BansMembars"],
-     BotPerms: ["BanMember"],
+     description: "Bans a member from the server",
+     UserPerms: ["BanMembars"],
+     BotPerms: ["BanMembers"],
      category: "Moderation",
      options: [
           {
@@ -31,15 +32,15 @@ module.exports = {
 
           await interaction.deferReply({ ephemeral: true })
 
-          const { user, options, guild } = interaction
+          const { options, user, guild } = interaction
 
           const member = options.getMember("user")
           const reason = options.getString("reason") || "no reason provided"
 
-          if (member.id === user.id) return editReply(interaction, "❌" `Nie możesz zbanować tego użytkownika`)
-          if (guild.ownerId === member.id) return editReply(interaction, "❌" `Nie możesz zbanować tego użytkownika`)
-          if (guild.members.me.roles.highest.position <= member.roles.highest.position) return editReply(interaction, "❌" `Nie możesz zbanować tego użytkownika`)
-          if (guild.member.roles.highest.position <= member.roles.highest.position) return editReply(interaction, "❌" `Nie możesz zbanowac tego użytkownika`)
+          if (member.id === user.id) return EditReply(interaction, "❌" `Nie możesz wyrzucić tego użytkownika`)
+          if (guild.ownerId === member.id) return EditReply(interaction, "❌" `Nie możesz wyrzucić tego użytkownika`)
+          if (guild.members.me.roles.highest.position <= member.roles.highest.position) return EditReply(interaction, "❌" `Nie możesz wyrzucić tego użytkownika`)
+          if (interaction.member.roles.highest.position <= member.roles.highest.position) return EditReply(interaction, "❌" `Nie możesz wyrzucić tego użytkownika`)
 
           const Embed = new EmbedBuilder()
                .setColor(client.color)
@@ -60,7 +61,7 @@ module.exports = {
           const Page = await interaction.editReply({
 
                embeds: [
-                    Embed.setDescription(`** Napewno chcesz zbanować tego użytkownika? **`)
+                    Embed.setDescription(`** Napewno chcesz usunąć tego użytkownika? **`)
                ],
                components: [row]
           })
@@ -82,7 +83,7 @@ module.exports = {
 
                          interaction.editReply({
                               embeds: [
-                                   Embed.setDescription(`${member} Dostał bana na: **${reason}** `)
+                                   Embed.setDescription(`${member} został wyrzucony z serwera: **${reason}** `)
                               ],
                               components: []
                          })
@@ -91,7 +92,7 @@ module.exports = {
                               embeds: [
                                    new EmbedBuilder()
                                         .setColor(client.color)
-                                        .setDescription(`Dostałeś bana na **${guild.name}**`)
+                                        .setDescription(`Dostałeś Bana na **${guild.name}**`)
                               ]
                          }).catch(err => {
 
@@ -117,7 +118,7 @@ module.exports = {
 
           col.on("end", (collected) => {
 
-               if (Collection.size >0) return
+               if (collection.size >  0) return
 
                interaction.editReply({
                     embeds: [

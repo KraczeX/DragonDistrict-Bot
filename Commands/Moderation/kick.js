@@ -1,10 +1,11 @@
-const { Client, ChatInputCommandInteraction, ApplicationCommandOptionType, EmbedBuilder, Colors, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, Collection } = require("discord.js")
-const editReply = require("../../Systems/editReply")
+const { Client, ChatInputCommandInteraction, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, ApplicationCommandOptionType} = require("discord.js")
+const ms = require("ms")
+const EditReply = require("../../Systems/editReply")
 
 
 module.exports = {
      name: "kick",
-     description: "Kick a member from this server",
+     description: "Kicks a member from the server",
      UserPerms: ["KickMembars"],
      BotPerms: ["KickMember"],
      category: "Moderation",
@@ -36,10 +37,10 @@ module.exports = {
           const member = options.getMember("user")
           const reason = options.getString("reason") || "no reason provided"
 
-          if (member.id === user.id) return editReply(interaction, "❌" `Nie możesz wyrzucić tego użytkownika`)
-          if (guild.ownerId === member.id) return editReply(interaction, "❌" `Nie możesz wyrzucić tego użytkownika`)
-          if (guild.members.me.roles.highest.position <= member.roles.highest.position) return editReply(interaction, "❌" `Nie możesz wyrzucić tego użytkownika`)
-          if (guild.member.roles.highest.position <= member.roles.highest.position) return editReply(interaction, "❌" `Nie możesz wyrzucić tego użytkownika`)
+          if (member.id === user.id) return EditReply(interaction, "❌" `Nie możesz wyrzucić tego użytkownika`)
+          if (guild.ownerId === member.id) return EditReply(interaction, "❌" `Nie możesz wyrzucić tego użytkownika`)
+          if (guild.members.me.roles.highest.position <= member.roles.highest.position) return EditReply(interaction, "❌" `Nie możesz wyrzucić tego użytkownika`)
+          if (interaction.member.roles.highest.position <= member.roles.highest.position) return EditReply(interaction, "❌" `Nie możesz wyrzucić tego użytkownika`)
 
           const Embed = new EmbedBuilder()
                .setColor(client.color)
@@ -117,7 +118,7 @@ module.exports = {
 
           col.on("end", (collected) => {
 
-               if (Collection.size >0) return
+               if (collection.size >  0) return
 
                interaction.editReply({
                     embeds: [

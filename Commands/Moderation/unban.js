@@ -1,21 +1,21 @@
-const { Client, ChatInputCommandInteraction, ApplicationCommandOptionType, EmbedBuilder, Colors, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, Collection } = require("discord.js")
-const { execute } = require("../../Events/Client/ready")
-const editReply = require("../../Systems/editReply")
+const { Client, ChatInputCommandInteraction, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ApplicationCommandOptionType} = require("discord.js")
+const ms = require("ms")
+const EditReply = require("../../Systems/editReply")
+
 
 module.exports = {
      name: "unban",
-     description: "unban a member from this server",
-     UserPerms: ["BansMembars"],
-     BotPerms: ["BanMember"],
+     description: "Unbans a member from the server",
+     UserPerms: ["BanMembars"],
+     BotPerms: ["BanMembers"],
      category: "Moderation",
      options: [
           {
                name: "user-id",
-               description: "Podaj id użytkownika",
+               description: "Wybierz osobę",
                type: 3,
                required: true
           },
-
      ],
 
      /**
@@ -26,15 +26,16 @@ module.exports = {
 
           await interaction.deferReply({ ephemeral: true })
 
-          const { user, options, guild } = interaction
+          const { options, user, guild } = interaction
 
-          const id = user.getString("user-id")
-          if (isNaN(id)) return editReply(interaction, `Wprowadź odpowiednie ID!`)
+          const member = options.getMember("user")
+          const reason = options.getString("reason") || "no reason provided"
 
-          const bannedMembers = await guild.bans.fetch()
-          if(!bannedMembers.find( x => x.user.id === id)) return editReply(interaction, `Ten użytkownik nie ma bana`)
+          if (member.id === user.id) return EditReply(interaction, "❌" `Nie możesz wyrzucić tego użytkownika`)
+          if (guild.ownerId === member.id) return EditReply(interaction, "❌" `Nie możesz wyrzucić tego użytkownika`)
+          if (guild.members.me.roles.highest.position <= member.roles.highest.position) return EditReply(interaction, "❌" `Nie możesz wyrzucić tego użytkownika`)
+          if (interaction.member.roles.highest.position <= member.roles.highest.position) return EditReply(interaction, "❌" `Nie możesz wyrzucić tego użytkownika`)
 
-  
           const Embed = new EmbedBuilder()
                .setColor(client.color)
 
@@ -42,19 +43,19 @@ module.exports = {
 
                new ButtonBuilder()
                     .setStyle(ButtonStyle.Danger)
-                    .setCustomId("unban-yes")
+                    .setCustomId("ban-yes")
                     .setLabel("Yes"),
 
                new ButtonBuilder()
                     .setStyle(ButtonStyle.Primary)
-                    .setCustomId("unban-no")
+                    .setCustomId("ban-no")
                     .setLabel("No")
           )
 
           const Page = await interaction.editReply({
 
                embeds: [
-                    Embed.setDescription(`** Napewno chcesz odbanować tego użytkownika? **`)
+                    Embed.setDescription(`** Napewno chcesz usunąć tego użytkownika? **`)
                ],
                components: [row]
           })
@@ -70,17 +71,27 @@ module.exports = {
 
                switch (i.customId) {
 
-                    case "unban-yes": {
+                    case "ban-yes": {
 
-                        guild.members.unban(id)
+                         member.ban({ reason })
 
                          interaction.editReply({
                               embeds: [
-                                   Embed.setDescription(`${member} dostał unbana`)
+                                   Embed.setDescription(`${member} został wyrzucony z serwera: **${reason}** `)
                               ],
                               components: []
                          })
 
+                         member.send({
+                              embeds: [
+                                   new EmbedBuilder()
+                                        .setColor(client.color)
+                                        .setDescription(`Dostałeś Bana na **${guild.name}**`)
+                              ]
+                         }).catch(err => {
+
+                              if (err.code !== 50007) return console.log(err)
+                         })
 
                     }
                          break;
@@ -101,7 +112,7 @@ module.exports = {
 
           col.on("end", (collected) => {
 
-               if (Collection.size >0) return
+               if (collection.size >  0) return
 
                interaction.editReply({
                     embeds: [
