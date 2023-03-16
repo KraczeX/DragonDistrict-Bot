@@ -1,6 +1,8 @@
 const { Client, ChatInputCommandInteraction, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, ApplicationCommandOptionType} = require("discord.js")
 const ms = require("ms")
 const EditReply = require("../../Systems/editReply")
+const { execute } = require("../../Events/Client/ready")
+const Reply = require("../../Systems/reply")
 
 
 module.exports = {

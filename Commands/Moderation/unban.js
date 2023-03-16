@@ -1,6 +1,8 @@
 const { Client, ChatInputCommandInteraction, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ApplicationCommandOptionType} = require("discord.js")
 const ms = require("ms")
 const EditReply = require("../../Systems/editReply")
+const { execute } = require("../../Events/Client/ready")
+
 
 
 module.exports = {
@@ -42,19 +44,19 @@ module.exports = {
 
                new ButtonBuilder()
                     .setStyle(ButtonStyle.Danger)
-                    .setCustomId("ban-yes")
+                    .setCustomId("unban-yes")
                     .setLabel("Yes"),
 
                new ButtonBuilder()
                     .setStyle(ButtonStyle.Primary)
-                    .setCustomId("ban-no")
+                    .setCustomId("unban-no")
                     .setLabel("No")
           )
 
           const Page = await interaction.editReply({
 
                embeds: [
-                    Embed.setDescription(`** Napewno chcesz usunąć tego użytkownika? **`)
+                    Embed.setDescription(`** Napewno chcesz odbanować tego użytkownika? **`)
                ],
                components: [row]
           })
@@ -70,9 +72,9 @@ module.exports = {
 
                switch (i.customId) {
 
-                    case "ban-yes": {
+                    case "unban-yes": {
 
-                         member.ban({ reason })
+                         guild.members.unban(id)
 
                          interaction.editReply({
                               embeds: [
@@ -81,25 +83,15 @@ module.exports = {
                               components: []
                          })
 
-                         member.send({
-                              embeds: [
-                                   new EmbedBuilder()
-                                        .setColor(client.color)
-                                        .setDescription(`Dostałeś Bana na **${guild.name}**`)
-                              ]
-                         }).catch(err => {
-
-                              if (err.code !== 50007) return console.log(err)
-                         })
 
                     }
                          break;
 
-                    case "ban-no": {
+                    case "unban-no": {
 
                          interaction.editReply({
                               embeds: [
-                                   Embed.setDescription(`Polecenie ban zostało anulowane`)
+                                   Embed.setDescription(`Polecenie unban zostało anulowane`)
                               ],
                               components: []
 
