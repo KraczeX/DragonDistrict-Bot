@@ -24,7 +24,7 @@ module.exports = async (client, PG, Ascii) => {
                else return Table.addRow(command.name, 'Failed')
 
           client.commands.set(command.name, command)
-          CommandsArray.push(command)
+          CommandsArray.push(command) 
 
           await Table.addRow(command.name, 'Work')
 
