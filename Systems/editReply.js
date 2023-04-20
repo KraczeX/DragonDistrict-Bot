@@ -1,6 +1,6 @@
 const { EmbedBuilder } = require("discord.js")
 
-function EditReply(interaction, emoji, description) {
+function editReply(interaction, emoji, description) {
 
      interaction.editReply({
           embeds: [
@@ -13,4 +13,4 @@ function EditReply(interaction, emoji, description) {
      })
 }
 
-module.exports  = EditReply
+module.exports  = editReply
