@@ -2,6 +2,7 @@ const { Client, CommandInteraction, MessageEmbed, MessageActionRow, MessageButto
 const ms = require("ms");
 const { reply, editReply } = require("../../Systems/reply");
 
+
 module.exports = {
      name: "kick",
      description: "Wyrzuca użytkownika z serwera",
@@ -36,10 +37,11 @@ module.exports = {
           const member = options.getMember("użytkownik");
           const reason = options.getString("powód") || "brak powodu";
 
-          if (member.id === user.id) return editReply(interaction, `Nie możesz wyrzucić tego użytkownika`)
-          if (guild.ownerId === member.id) return editReply(interaction,  `Nie możesz wyrzucić tego użytkownika`)
-          if (guild.members.me.roles.highest.position <= member.roles.highest.position) return editReply(interaction, `Nie możesz wyrzucić tego użytkownika`)
-          if (interaction.member.roles.highest.position <= member.roles.highest.position) return editReply(interaction, `Nie możesz wyrzucić tego użytkownika`)
+          if (member.id === user.id) return editReply(interaction, `❌ Nie możesz wyrzucić tego użytkownika`)
+          if (guild.ownerId === member.id) return editReply(interaction, `❌ Nie możesz wyrzucić tego użytkownika`)
+          if (guild.members.me.roles.highest.position <= member.roles.highest.position) return editReply(interaction, `❌ Nie możesz wyrzucić tego użytkownika`)
+          if (interaction.member.roles.highest.position <= member.roles.highest.position) return editReply(interaction, `❌ Nie możesz wyrzucić tego użytkownika`)
+
 
           const embed = new MessageEmbed()
                .setColor(client.color);
