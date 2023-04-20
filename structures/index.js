@@ -18,7 +18,7 @@ client.color = "Purple"
 client.events = new Collection()
 client.commands = new Collection()
 
-const Handlers = ["Events", "Commands"]
+const Handlers = ["Events", "Commands", "Errors"]
 
 Handlers.forEach(handler => {
 
