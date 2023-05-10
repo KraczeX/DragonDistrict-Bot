@@ -1,13 +1,14 @@
-const { MessageEmbed } = require("discord.js");
+const {EmbedBuilder} = require("discord.js")
 
-module.exports = {
-  editReply: async function(interaction, emoji, description) {
-    await interaction.editReply({
-      embeds: [
-        new MessageEmbed()
-          .setColor("PURPLE")
-          .setDescription(`${emoji} | ${description}`)
-      ]
-    });
-  }
-};
+function EditReply(interaction, emoji, description) {
+
+      interaction.editReply({
+        embeds: [
+          new EmbedBuilder()
+            .setColor("Green")
+            .setDescription(`${emoji} | ${description}`)
+        ],
+      })
+}
+
+module.exports = EditReply

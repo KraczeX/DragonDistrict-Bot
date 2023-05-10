@@ -8,7 +8,7 @@ module.exports = {
      description: "Wyrzuca użytkownika z serwera",
      userPermissions: ["KICK_MEMBERS"],
      botPermissions: ["KICK_MEMBERS"],
-     category: "Moderacja",
+     category: "Moderation",
      options: [
           {
                name: "użytkownik",
