@@ -1,13 +1,13 @@
-const { Client, CommandInteraction, MessageEmbed, MessageActionRow, MessageButton, Permissions } = require("discord.js");
+const { Client, ChatInputCommandInteraction, ApplicationCommandOptionType, Embed, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require("discord.js");
 const ms = require("ms");
-const { reply, editReply } = require("../../Systems/reply");
-
+const EditReply = require("../../Systems/EditReply");
+const { color } = require("../../structures");
 
 module.exports = {
      name: "kick",
      description: "Wyrzuca użytkownika z serwera",
-     userPermissions: ["KICK_MEMBERS"],
-     botPermissions: ["KICK_MEMBERS"],
+     userPermissions: ["KickMembers"],
+     botPermissions: ["KickMembers"],
      category: "Moderation",
      options: [
           {
@@ -26,90 +26,108 @@ module.exports = {
 
      /**
       *   @param {Client} client
-      *   @param {CommandInteraction} interaction
+      *   @param {ChatInputCommandInteraction} interaction
       */
      async execute(interaction, client) {
 
-          await interaction.deferReply({ ephemeral: true });
+          await interaction.deferReply({ ephemeral: true })
 
           const { options, user, guild } = interaction;
 
           const member = options.getMember("użytkownik");
           const reason = options.getString("powód") || "brak powodu";
 
-          if (member.id === user.id) return editReply(interaction, `❌ Nie możesz wyrzucić tego użytkownika`)
-          if (guild.ownerId === member.id) return editReply(interaction, `❌ Nie możesz wyrzucić tego użytkownika`)
-          if (guild.members.me.roles.highest.position <= member.roles.highest.position) return editReply(interaction, `❌ Nie możesz wyrzucić tego użytkownika`)
-          if (interaction.member.roles.highest.position <= member.roles.highest.position) return editReply(interaction, `❌ Nie możesz wyrzucić tego użytkownika`)
+          if (member.id === user.id) return EditReply(interaction, `❌ | Nie możesz wyrzucić tego użytkownika`)
+          if (guild.ownerId === member.id) return EditReply(interaction, `❌ | Nie możesz wyrzucić tego użytkownika`)
+          if (guild.members.me.roles.highest.position <= member.roles.highest.position) return EditReply(interaction, `❌ | Nie możesz wyrzucić tego użytkownika`)
+          if (interaction.member.roles.highest.position <= member.roles.highest.position) return EditReply(interaction, `❌ | Nie możesz wyrzucić tego użytkownika`)
 
 
-          const embed = new MessageEmbed()
+          const Embed = new EmbedBuilder()
                .setColor(client.color);
 
-          const row = new MessageActionRow().addComponents(
+          const row = new ActionRowBuilder().addComponents(
 
-               new MessageButton()
+               new ButtonBuilder()
                     .setStyle("DANGER")
                     .setCustomId("kick-tak")
                     .setLabel("Tak"),
 
-               new MessageButton()
-                    .setStyle("PRIMARY")
+               new ButtonBuilder()
+                    .setStyle(ButtonStyle.Primary)
                     .setCustomId("kick-nie")
                     .setLabel("Nie")
           );
 
-          const page = await interaction.editReply({
+          const Page = await interaction.editReply({
 
                embeds: [
-                    embed.setDescription(`**Czy na pewno chcesz wyrzucić tego użytkownika?**`)
+                    Embed.setDescription(`**Czy na pewno chcesz wyrzucić tego użytkownika?**`)
                ],
                components: [row]
-          });
+          })
 
-          const collector = page.createMessageComponentCollector({
-               componentType: "BUTTON",
+          const col = await Page.createMessageComponentCollector({
+               componentType: ComponentType.Button,
                time: ms("15s")
-          });
+          })
 
-          collector.on("collect", async (i) => {
+          col.on("collect", i => {
 
-               if (i.user.id !== user.id) return;
+               if (i.user.id !== user.id) return
 
                switch (i.customId) {
 
                     case "kick-tak": {
 
-                         await member.kick(reason);
+                         member.kick(reason);
 
-                         await editReply(interaction, {
+                         interaction.editReply ({
                               embeds: [
-                                   embed.setDescription(`${member.username} został wyrzucony z serwera\nPowód: ${reason}`)
+                                   Embed.setDescription(`${member} został wyrzucony z serwera za: ${reason}`)
+                              ],
+                              components: []
+                         })
+                         
+                         member.send({
+                              embeds: [
+                                   new EmbedBuilder()
+                                        .setColor(client.color)
+                                        .setDescription(`Zostałeś wyrzucony z **${guild.name}**`)
                               ]
-                         }); break;
+                         }).catch(err => {
+
+                              if (err.code !== 50007) return console.log(err)
+                         })
+                         
+                         
                     }
+                    break;
 
                     case "kick-nie": {
 
-                         await editReply(interaction, {
+                         interaction.editReply ({
                               embeds: [
-                                   embed.setDescription("❌ Anulowano wyrzucanie użytkownika.")
+                                   Embed.setDescription("❌ Anulowano wyrzucanie użytkownika.")
                               ],
                               components: []
-                         });
-                         break;
+                         })
                     }
+                    break;
                }
-          }); collector.on("end", async (collected, reason) => {
+          })
+          col.on("end", (collected) => {
 
-               if (reason === "time") {
-                    await editReply(interaction, {
-                         embeds: [
-                              embed.setDescription("❌ Upłynął limit czasu na odpowiedź.")
-                         ],
-                         components: []
-                    });
-               }
-          });
+               if(collected.size > 0) return
+
+               interaction.editReply({
+                    embeds: [
+                         Embed.setDescription(`Nie podałeś odpowiedzi`)
+                    ],
+
+                    components: []
+               })
+          })
      }
-};
+}
+     
