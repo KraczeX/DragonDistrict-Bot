@@ -1,1 +1,1 @@
-# Personal-Bot
+Bot Na Prywatny Server. Porzucono
