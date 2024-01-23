@@ -1,1 +1,1 @@
-Bot Na Prywatny Server. Porzucono
+Bot Na Prywatny Server. Prototyp
